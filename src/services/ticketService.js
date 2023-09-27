@@ -1,5 +1,5 @@
-export const getAllTickets = async () => {
-    const response = await fetch("http://localhost:8088/serviceTickets")
-    const tickets = await response.json()
-     return tickets
+export const getAllTickets =  () => {
+    return fetch(
+        'http://localhost:8088/serviceTickets?_embed=employeeTickets'
+    ).then((res) => res.json())
 }
