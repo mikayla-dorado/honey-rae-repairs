@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
 import { getAllEmployees } from "../../services/employeeService"
-import { assignTicket } from "../../services/ticketService"
+ import { assignTicket, updateTicket } from "../../services/ticketService"
 
-export const Ticket = ({ ticket, currentUser}) => {
+export const Ticket = ({ ticket, currentUser, getAndSetTickets}) => {
   const [employees, setEmployees] = useState([])
   const [assignedEmployee, setAssignedEmployee] = useState({})
 
-
+  
   useEffect(() => {
     getAllEmployees().then((employeeArray) => {
       setEmployees(employeeArray)
@@ -14,24 +14,42 @@ export const Ticket = ({ ticket, currentUser}) => {
   }, [])
 
   useEffect(() => {
-    const foundemployee = employees.find(employee => employee.id === ticket.employeeTickets[0]?.employeeId
+    const foundEmployee = employees.find(
+      (employee) => employee.id === ticket.employeeTickets[0]?.employeeId
+      
     )
-    setAssignedEmployee(foundemployee)
+    setAssignedEmployee(foundEmployee)
   }, [employees, ticket])
+
 
   const handleClaim = () => {
     const currentEmployee = employees.find(
-      (employee) =>  employee.userId === currentUser.id)
+      (employee) =>  employee.userId === currentUser.id
+      )
 
     const newEmployeeTicket = {
       employeeId: currentEmployee.id,
-      serviceTicketId: ticket.id
+      serviceTicketId: ticket.id,
     }
 
     assignTicket(newEmployeeTicket).then(() => {
-      console.log("what??")
+      getAndSetTickets()
     })
-  
+  }
+
+
+  const handleClose = () => {
+    const closedTicket = {
+      id: ticket.id,
+      userId: ticket.userId,
+      description: ticket.description,
+      emergency: ticket.emergency,
+      dateCompleted: new Date(),
+    }
+
+    updateTicket(closedTicket).then(() => {
+      getAndSetTickets()
+    })
   }
 
   return (
@@ -66,7 +84,7 @@ export const Ticket = ({ ticket, currentUser}) => {
 
           {assignedEmployee?.userId === currentUser.id && 
           !ticket.dateCompleted ? (
-          <button className="btn btn-warning">Close</button>
+          <button className="btn btn-warning" onClick={handleClose}>Close</button>
           ) : (
             ""
           )}
@@ -76,3 +94,4 @@ export const Ticket = ({ ticket, currentUser}) => {
     </section>
   )
 }
+
