@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { getAllEmployees } from "../../services/employeeService"
- import { assignTicket, updateTicket } from "../../services/ticketService"
+ import { assignTicket, deleteTicket, updateTicket } from "../../services/ticketService"
 
 export const Ticket = ({ ticket, currentUser, getAndSetTickets}) => {
   const [employees, setEmployees] = useState([])
@@ -52,6 +52,12 @@ export const Ticket = ({ ticket, currentUser, getAndSetTickets}) => {
     })
   }
 
+  const handleDelete = () => {
+    deleteTicket(ticket.id).then(() => {
+      getAndSetTickets()
+    })
+  }
+
   return (
     <section className="ticket">
       <header className="ticket-info">#{ticket.id}</header>
@@ -71,12 +77,10 @@ export const Ticket = ({ ticket, currentUser, getAndSetTickets}) => {
           {/* if the logged in user is an employee and there is no employee ticket associated
           with the service ticket, then a btn to claim the ticket should display */}
 
-          {currentUser.isStaff && !assignedEmployee ? (
+          {currentUser.isStaff && !assignedEmployee && (
           <button className="btn btn-secondary" onClick={handleClaim}>
             Claim
             </button>
-          ) : (
-          ""
           )}
 
           {/* if the logged in user is the assignedEmployee for the ticket and there is no date
@@ -87,6 +91,8 @@ export const Ticket = ({ ticket, currentUser, getAndSetTickets}) => {
           <button className="btn btn-warning" onClick={handleClose}>Close</button>
           ) : (
             ""
+          )}
+          {!currentUser.isStaff && (<button className="btn btn-warning" onClick={handleDelete}>Delete</button>
           )}
 
         </div>
